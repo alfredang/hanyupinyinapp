@@ -17,3 +17,9 @@ xcuserdata/
 
 # Tooling
 .playwright-mcp/
+.claude/
+
+# Build / submission artifacts
+archive.xcarchive/
+ipa_out/
+store_shots/
