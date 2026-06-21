@@ -21,6 +21,8 @@ A native iOS app for learning **Hanyu Pinyin** (Chinese romanization) and practi
   (no tone marks needed, just like a real IME), with live feedback and **accuracy + 字/分钟** scoring:
   - 汉字 (characters), 词语 (words), 声母, 韵母, 长句 (sentences), 综合 (mixed).
   - **简拼速打** — a first-letter **shortcut drill** (type `wan` for 我爱你) for efficient input.
+  - **长信息练习** — **long-message** drill (whole sentence or 简拼) for sustained fast typing.
+  - **ü → v 练习** — the keyboard technique of typing **ü as `v`** (绿 → `lv`, 律师 → `lvshi`).
   - **限时挑战** — a **60-second speed challenge** with a live countdown and auto-advance.
 - **设置 (Settings)** — choose a **female or male** Chinese voice for pronunciation.
 - **反馈 (Feedback)** — send feedback straight to the team via WhatsApp.

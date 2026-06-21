@@ -174,4 +174,35 @@ enum PinyinData {
         .init(prompt: "我们一起去", toned: "wǒ men yì qǐ qù", answer: "womenyiqiqu",
               meaning: "Let's go together", abbr: "wmyqq"),
     ]
+
+    // 长信息 (longer messages) — train sustained fast typing. Type the full pinyin OR the
+    // 简拼 first-letter shortcut (`abbr`); both count.
+    static let paragraphs: [PinyinPrompt] = [
+        .init(prompt: "你好我叫小明", toned: "nǐ hǎo wǒ jiào xiǎo míng",
+              answer: "nihaowojiaoxiaoming", meaning: "Hello, my name is Xiao Ming", abbr: "nhwjxm"),
+        .init(prompt: "我今天很忙明天见", toned: "wǒ jīn tiān hěn máng míng tiān jiàn",
+              answer: "wojintianhenmangmingtianjian", meaning: "I'm busy today, see you tomorrow", abbr: "wjthmmtj"),
+        .init(prompt: "很高兴认识你", toned: "hěn gāo xìng rèn shi nǐ",
+              answer: "hengaoxingrenshini", meaning: "Nice to meet you", abbr: "hgxrsn"),
+        .init(prompt: "我想喝一杯咖啡", toned: "wǒ xiǎng hē yì bēi kā fēi",
+              answer: "woxiangheyibeikafei", meaning: "I'd like a cup of coffee", abbr: "wxhybkf"),
+        .init(prompt: "周末我们去看电影", toned: "zhōu mò wǒ men qù kàn diàn yǐng",
+              answer: "zhoumowomenqukandianying", meaning: "Let's see a movie this weekend", abbr: "zmwmqkdy"),
+        .init(prompt: "请问洗手间在哪里", toned: "qǐng wèn xǐ shǒu jiān zài nǎ lǐ",
+              answer: "qingwenxishoujianzaili", meaning: "Where is the restroom?", abbr: "qwxsjznl"),
+        .init(prompt: "谢谢你的帮助", toned: "xiè xie nǐ de bāng zhù",
+              answer: "xiexienidebangzhu", meaning: "Thanks for your help", abbr: "xxndbz"),
+    ]
+
+    // ü → v technique: on a pinyin keyboard, ü is typed as the letter v.
+    static let vWords: [PinyinPrompt] = [
+        .init(prompt: "女", toned: "nǚ", answer: "nv", meaning: "woman · 用 v 打 ü"),
+        .init(prompt: "绿", toned: "lǜ", answer: "lv", meaning: "green · 用 v 打 ü"),
+        .init(prompt: "旅游", toned: "lǚ yóu", answer: "lvyou", meaning: "to travel · 用 v 打 ü"),
+        .init(prompt: "女儿", toned: "nǚ ér", answer: "nver", meaning: "daughter · 用 v 打 ü"),
+        .init(prompt: "律师", toned: "lǜ shī", answer: "lvshi", meaning: "lawyer · 用 v 打 ü"),
+        .init(prompt: "绿色", toned: "lǜ sè", answer: "lvse", meaning: "green (color) · 用 v 打 ü"),
+        .init(prompt: "女人", toned: "nǚ rén", answer: "nvren", meaning: "woman · 用 v 打 ü"),
+        .init(prompt: "旅行", toned: "lǚ xíng", answer: "lvxing", meaning: "trip · 用 v 打 ü"),
+    ]
 }
