@@ -8,23 +8,30 @@ struct PracticeSessionView: View {
     @State private var entry = ""
     @State private var feedback: Feedback? = nil
     @State private var correctCount = 0
+    @State private var attempted = 0
     @State private var startDate = Date()
     @State private var finished = false
+    @State private var timeLeft: Int
     @FocusState private var focused: Bool
+
+    private let ticker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     enum Feedback: Equatable { case correct, wrong(String) }
 
     init(session: PracticeSession) {
         self.session = session
-        _prompts = State(initialValue: session.round())
+        _prompts = State(initialValue: session.round(count: session.timed != nil ? 100 : 10))
+        _timeLeft = State(initialValue: session.timed ?? 0)
     }
+
+    private var isTimed: Bool { session.timed != nil }
 
     var body: some View {
         Group {
             if finished {
-                ResultView(total: prompts.count,
+                ResultView(total: isTimed ? attempted : prompts.count,
                            correct: correctCount,
-                           seconds: Date().timeIntervalSince(startDate),
+                           seconds: isTimed ? Double(session.timed ?? 1) : Date().timeIntervalSince(startDate),
                            onRestart: restart)
             } else {
                 sessionBody
@@ -34,11 +41,16 @@ struct PracticeSessionView: View {
         .navigationTitle(session.title)
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            if prompts.isEmpty { prompts = session.round() }
+            if prompts.isEmpty { prompts = session.round(count: isTimed ? 100 : 10) }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                 focused = true
                 Speaker.shared.speak(current.prompt)
             }
+        }
+        .onReceive(ticker) { _ in
+            guard isTimed, !finished else { return }
+            if timeLeft > 0 { timeLeft -= 1 }
+            if timeLeft <= 0 { finished = true }
         }
     }
 
@@ -48,31 +60,50 @@ struct PracticeSessionView: View {
 
     private var sessionBody: some View {
         VStack(spacing: 20) {
-            // Progress
+            // Progress / timer
             VStack(spacing: 8) {
-                ProgressView(value: Double(index), total: Double(max(prompts.count, 1)))
-                    .tint(Theme.accent)
-                HStack {
-                    Text("第 \(index + 1) / \(prompts.count) 题")
-                        .font(.subheadline).foregroundStyle(Theme.mutedInk)
-                    Spacer()
-                    Label("\(correctCount)", systemImage: "checkmark.circle.fill")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(Theme.success)
+                if isTimed {
+                    ProgressView(value: Double((session.timed ?? 1) - timeLeft),
+                                 total: Double(session.timed ?? 1))
+                        .tint(Theme.accent)
+                    HStack {
+                        Label("\(timeLeft)s", systemImage: "timer")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(timeLeft <= 10 ? Theme.error : Theme.mutedInk)
+                        Spacer()
+                        Label("\(correctCount)", systemImage: "checkmark.circle.fill")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Theme.success)
+                    }
+                } else {
+                    ProgressView(value: Double(index), total: Double(max(prompts.count, 1)))
+                        .tint(Theme.accent)
+                    HStack {
+                        Text("第 \(index + 1) / \(prompts.count) 题")
+                            .font(.subheadline).foregroundStyle(Theme.mutedInk)
+                        Spacer()
+                        Label("\(correctCount)", systemImage: "checkmark.circle.fill")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Theme.success)
+                    }
                 }
             }
 
             // Prompt card
             VStack(spacing: 10) {
                 Text(current.prompt)
-                    .font(.system(size: 64, weight: .bold))
+                    .font(.system(size: 60, weight: .bold))
                     .foregroundStyle(Theme.ink)
-                    .minimumScaleFactor(0.5)
+                    .minimumScaleFactor(0.4)
                     .lineLimit(1)
                 Text(current.meaning)
                     .font(.subheadline)
                     .foregroundStyle(Theme.mutedInk)
-                if !current.abbr.isEmpty {
+                if session.shortcutOnly {
+                    Text("只打首字母简拼：\(current.abbr)")
+                        .font(.callout.weight(.semibold))
+                        .foregroundStyle(Theme.highlight)
+                } else if !current.abbr.isEmpty {
                     Text("简拼快捷键：\(current.abbr)（输入首字母也算对）")
                         .font(.caption)
                         .foregroundStyle(Theme.highlight)
@@ -94,7 +125,7 @@ struct PracticeSessionView: View {
 
             // Input
             VStack(spacing: 12) {
-                TextField("输入拼音…", text: $entry)
+                TextField(session.shortcutOnly ? "输入首字母…" : "输入拼音…", text: $entry)
                     .font(.title2)
                     .multilineTextAlignment(.center)
                     .textInputAutocapitalization(.never)
@@ -110,11 +141,9 @@ struct PracticeSessionView: View {
                     .onSubmit(handleSubmit)
                     .disabled(feedback != nil)
 
-                if let feedback {
-                    feedbackBanner(feedback)
-                }
+                if let feedback { feedbackBanner(feedback) }
 
-                Button(action: primaryAction) {
+                Button(action: handleSubmit) {
                     Text(feedback == nil ? "确认" : "下一题")
                         .font(.headline)
                         .foregroundStyle(.white)
@@ -149,8 +178,7 @@ struct PracticeSessionView: View {
         case .wrong(let answer):
             HStack(spacing: 8) {
                 Image(systemName: "xmark.circle.fill").foregroundStyle(Theme.error)
-                Text("正确答案：")
-                    .foregroundStyle(Theme.ink)
+                Text("正确答案：").foregroundStyle(Theme.ink)
                 Text(answer).font(.headline).foregroundStyle(Theme.error)
                 Spacer()
             }
@@ -164,42 +192,58 @@ struct PracticeSessionView: View {
         if feedback == nil { check() } else { next() }
     }
 
-    private func primaryAction() {
-        if feedback == nil { check() } else { next() }
-    }
-
     private func check() {
         let typed = entry.pinyinPlain
         guard !typed.isEmpty else { return }
+        attempted += 1
         let abbr = current.abbr.lowercased()
-        if typed == current.answer || (!abbr.isEmpty && typed == abbr) {
+        let ok: Bool
+        if session.shortcutOnly {
+            ok = !abbr.isEmpty && typed == abbr
+        } else {
+            ok = typed == current.answer || (!abbr.isEmpty && typed == abbr)
+        }
+        if ok {
             correctCount += 1
             feedback = .correct
+            Speaker.shared.speak(current.prompt)
+            // In a speed challenge, keep momentum: auto-advance on a correct answer.
+            if isTimed {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    if !finished { next() }
+                }
+            }
         } else {
-            feedback = .wrong(current.answer)
-        }
-        Speaker.shared.speak(current.prompt)   // reinforce correct pronunciation
-    }
-
-    private func next() {
-        if index + 1 >= prompts.count {
-            finished = true
-        } else {
-            index += 1
-            entry = ""
-            feedback = nil
-            focused = true
+            feedback = .wrong(session.shortcutOnly ? abbr : current.answer)
             Speaker.shared.speak(current.prompt)
         }
     }
 
+    private func next() {
+        if !isTimed && index + 1 >= prompts.count {
+            finished = true
+            return
+        }
+        // Timed: refill the pool so we never run out before the clock does.
+        if isTimed && index + 1 >= prompts.count {
+            prompts += session.round(count: 100)
+        }
+        index += 1
+        entry = ""
+        feedback = nil
+        focused = true
+        Speaker.shared.speak(current.prompt)
+    }
+
     private func restart() {
-        prompts = session.round()
+        prompts = session.round(count: isTimed ? 100 : 10)
         index = 0
         entry = ""
         feedback = nil
         correctCount = 0
+        attempted = 0
         finished = false
+        timeLeft = session.timed ?? 0
         startDate = Date()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { focused = true }
     }

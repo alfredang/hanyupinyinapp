@@ -193,8 +193,16 @@ struct InputMethodView: View {
         ("无需声调", "拼音输入法不需要输入声调符号，直接打字母。"),
         ("整词输入", "可以一次输入整个词语，例如 “zhongguo” → 中国。"),
         ("选字", "用数字键或空格选择候选字，常用字通常排在最前。"),
-        ("多练习", "在「练习」里输入拼音，越练越快！"),
+        ("动手练习", "光看不够，马上动手输入拼音，越练越快！"),
     ]
+
+    /// The 限时挑战 and 简拼速打 sessions, surfaced right from the lesson.
+    private var speedChallenge: PracticeSession? {
+        PracticeCatalog.sessions.first { $0.title == "限时挑战" }
+    }
+    private var shortcutDrill: PracticeSession? {
+        PracticeCatalog.sessions.first { $0.title == "简拼速打" }
+    }
 
     var body: some View {
         ScrollView {
@@ -217,12 +225,45 @@ struct InputMethodView: View {
                     }
                     .appCard()
                 }
+
+                Text("立即练习")
+                    .font(.headline)
+                    .foregroundStyle(Theme.ink)
+                    .padding(.top, 6)
+                if let s = speedChallenge {
+                    NavigationLink { PracticeSessionView(session: s) } label: {
+                        practiceButton(icon: "timer", title: "限时挑战",
+                                       subtitle: "60 秒内尽量多打 · 测速度", color: Color(red: 0.80, green: 0.15, blue: 0.40))
+                    }
+                }
+                if let s = shortcutDrill {
+                    NavigationLink { PracticeSessionView(session: s) } label: {
+                        practiceButton(icon: "hare.fill", title: "简拼速打",
+                                       subtitle: "只打首字母 · 练快捷输入", color: Color(red: 0.0, green: 0.55, blue: 0.55))
+                    }
+                }
             }
             .padding(20)
         }
         .background(Theme.background)
         .navigationTitle("拼音输入法")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func practiceButton(icon: String, title: String, subtitle: String, color: Color) -> some View {
+        HStack(spacing: 16) {
+            Image(systemName: icon)
+                .font(.title2).foregroundStyle(.white)
+                .frame(width: 48, height: 48)
+                .background(color, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title).font(.headline).foregroundStyle(Theme.ink)
+                Text(subtitle).font(.subheadline).foregroundStyle(Theme.mutedInk)
+            }
+            Spacer()
+            Image(systemName: "chevron.right").foregroundStyle(Theme.mutedInk)
+        }
+        .appCard()
     }
 }
 

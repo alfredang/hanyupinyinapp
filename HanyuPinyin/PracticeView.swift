@@ -9,10 +9,16 @@ struct PracticeSession: Identifiable {
     let icon: String
     let color: Color
     let prompts: [PinyinPrompt]
+    /// If set, this is a timed speed challenge (seconds) instead of a fixed-count round.
+    var timed: Int? = nil
+    /// If true, only the 简拼 (first-letter shortcut) is accepted — trains fast input.
+    var shortcutOnly: Bool = false
 
-    /// Build a session of `count` randomly-ordered prompts.
+    /// Build a list of `count` randomly-ordered prompts, repeating the pool if needed.
     func round(count: Int = 10) -> [PinyinPrompt] {
-        Array(prompts.shuffled().prefix(count))
+        var out: [PinyinPrompt] = []
+        while out.count < count && !prompts.isEmpty { out += prompts.shuffled() }
+        return Array(out.prefix(count))
     }
 }
 
@@ -53,6 +59,12 @@ enum PracticeCatalog {
         .init(title: "长句练习", subtitle: "整句快打 · 可用简拼 · Sentences",
               icon: "bolt.fill", color: Color(red: 0.90, green: 0.45, blue: 0.10),
               prompts: PinyinData.sentences),
+        .init(title: "简拼速打", subtitle: "只打首字母 · Shortcut drill",
+              icon: "hare.fill", color: Color(red: 0.0, green: 0.55, blue: 0.55),
+              prompts: PinyinData.sentences, shortcutOnly: true),
+        .init(title: "限时挑战", subtitle: "60 秒速度挑战 · Speed challenge",
+              icon: "timer", color: Color(red: 0.80, green: 0.15, blue: 0.40),
+              prompts: PinyinData.characters + PinyinData.words, timed: 60),
         .init(title: "综合练习", subtitle: "汉字 + 词语混合 · Mixed",
               icon: "shuffle", color: Color(red: 0.55, green: 0.28, blue: 0.72),
               prompts: PinyinData.characters + PinyinData.words),
