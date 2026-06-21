@@ -72,6 +72,11 @@ struct PracticeSessionView: View {
                 Text(current.meaning)
                     .font(.subheadline)
                     .foregroundStyle(Theme.mutedInk)
+                if !current.abbr.isEmpty {
+                    Text("简拼快捷键：\(current.abbr)（输入首字母也算对）")
+                        .font(.caption)
+                        .foregroundStyle(Theme.highlight)
+                }
                 if case .correct = feedback {
                     Text(current.toned)
                         .font(.title3.weight(.semibold))
@@ -166,7 +171,8 @@ struct PracticeSessionView: View {
     private func check() {
         let typed = entry.pinyinPlain
         guard !typed.isEmpty else { return }
-        if typed == current.answer {
+        let abbr = current.abbr.lowercased()
+        if typed == current.answer || (!abbr.isEmpty && typed == abbr) {
             correctCount += 1
             feedback = .correct
         } else {

@@ -34,6 +34,13 @@ struct LearnView: View {
                         LearnCard(icon: "keyboard", color: Theme.success,
                                   title: "拼音输入法", subtitle: "如何用拼音打字 · Typing")
                     }
+
+                    NavigationLink {
+                        FastTypingView()
+                    } label: {
+                        LearnCard(icon: "bolt.fill", color: Color(red: 0.90, green: 0.45, blue: 0.10),
+                                  title: "快速输入技巧", subtitle: "简拼与快捷打字 · Fast typing")
+                    }
                 }
                 .padding(20)
             }
@@ -215,6 +222,49 @@ struct InputMethodView: View {
         }
         .background(Theme.background)
         .navigationTitle("拼音输入法")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+// MARK: - Fast typing tips
+
+struct FastTypingView: View {
+    private let tips: [(String, String)] = [
+        ("整句输入", "一次连续打出整句拼音，不用空格、不用声调。例如 “woaini” → 我爱你，输入法会自动分词。"),
+        ("简拼（首字母）", "只打每个字的第一个字母即可。例如 “bjdx” → 北京大学，“wan” → 我爱你。常用词用简拼最快。"),
+        ("空格选词", "打完拼音按空格键就选中第一个候选词；常用字一般排在最前面。"),
+        ("数字选字", "候选栏里用数字键 1–9 快速选择对应的字或词。"),
+        ("ü 用 v 代替", "韵母 ü 在键盘上打字母 v。例如 “lv” → 绿，“nv” → 女。"),
+        ("善用联想", "选完一个词后，输入法会联想下一个常用词，直接按数字即可，省去重复输入。"),
+        ("多用长句练习", "到「练习 › 长句练习」里用整句和简拼来训练，速度会越来越快！"),
+    ]
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 14) {
+                Text("掌握这些技巧，拼音输入又快又准。")
+                    .font(.subheadline)
+                    .foregroundStyle(Theme.mutedInk)
+                ForEach(Array(tips.enumerated()), id: \.offset) { idx, tip in
+                    HStack(alignment: .top, spacing: 16) {
+                        Image(systemName: "bolt.fill")
+                            .font(.subheadline)
+                            .foregroundStyle(.white)
+                            .frame(width: 32, height: 32)
+                            .background(Color(red: 0.90, green: 0.45, blue: 0.10), in: Circle())
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(tip.0).font(.headline).foregroundStyle(Theme.ink)
+                            Text(tip.1).font(.subheadline).foregroundStyle(Theme.mutedInk)
+                        }
+                        Spacer()
+                    }
+                    .appCard()
+                }
+            }
+            .padding(20)
+        }
+        .background(Theme.background)
+        .navigationTitle("快速输入技巧")
         .navigationBarTitleDisplayMode(.inline)
     }
 }

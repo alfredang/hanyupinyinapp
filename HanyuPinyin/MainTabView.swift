@@ -7,6 +7,8 @@ struct MainTabView: View {
                 .tabItem { Label("学习", systemImage: "book.fill") }
             PracticeHomeView()
                 .tabItem { Label("练习", systemImage: "keyboard.fill") }
+            SettingsView()
+                .tabItem { Label("设置", systemImage: "gearshape.fill") }
             FeedbackView()
                 .tabItem { Label("反馈", systemImage: "bubble.left.and.bubble.right.fill") }
             AboutView()

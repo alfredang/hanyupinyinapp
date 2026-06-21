@@ -17,6 +17,7 @@ struct PinyinPrompt: Identifiable, Hashable {
     let toned: String         // the toned pinyin (for showing the correct answer)
     let answer: String        // expected typed pinyin, lowercase, no tone marks, no spaces
     let meaning: String       // short gloss in 简体中文 / English
+    var abbr: String = ""     // optional 简拼 shortcut (initials only), also accepted as correct
     var id: String { prompt + answer }
 }
 
@@ -147,5 +148,30 @@ enum PinyinData {
         .init(prompt: "漂亮", toned: "piào liang", answer: "piaoliang", meaning: "pretty"),
         .init(prompt: "高兴", toned: "gāo xìng", answer: "gaoxing", meaning: "happy"),
         .init(prompt: "再见", toned: "zài jiàn", answer: "zaijian", meaning: "goodbye"),
+    ]
+
+    // 长句 (sentences) for fast-typing practice. `abbr` is the 简拼 first-letter shortcut —
+    // both the full pinyin and the shortcut are accepted, to teach fast input.
+    static let sentences: [PinyinPrompt] = [
+        .init(prompt: "你好吗", toned: "nǐ hǎo ma", answer: "nihaoma",
+              meaning: "How are you?", abbr: "nhm"),
+        .init(prompt: "我爱你", toned: "wǒ ài nǐ", answer: "woaini",
+              meaning: "I love you", abbr: "wan"),
+        .init(prompt: "谢谢你", toned: "xiè xie nǐ", answer: "xiexieni",
+              meaning: "Thank you", abbr: "xxn"),
+        .init(prompt: "我是学生", toned: "wǒ shì xué sheng", answer: "woshixuesheng",
+              meaning: "I am a student", abbr: "wsxs"),
+        .init(prompt: "今天天气好", toned: "jīn tiān tiān qì hǎo", answer: "jintiantianqihao",
+              meaning: "The weather is nice today", abbr: "jttqh"),
+        .init(prompt: "我喜欢学中文", toned: "wǒ xǐ huan xué zhōng wén", answer: "woxihuanxuezhongwen",
+              meaning: "I like learning Chinese", abbr: "wxhxzw"),
+        .init(prompt: "中国很大", toned: "zhōng guó hěn dà", answer: "zhongguohenda",
+              meaning: "China is very big", abbr: "zghd"),
+        .init(prompt: "明天见", toned: "míng tiān jiàn", answer: "mingtianjian",
+              meaning: "See you tomorrow", abbr: "mtj"),
+        .init(prompt: "请问多少钱", toned: "qǐng wèn duō shao qián", answer: "qingwenduoshaoqian",
+              meaning: "How much is it?", abbr: "qwdsq"),
+        .init(prompt: "我们一起去", toned: "wǒ men yì qǐ qù", answer: "womenyiqiqu",
+              meaning: "Let's go together", abbr: "wmyqq"),
     ]
 }
