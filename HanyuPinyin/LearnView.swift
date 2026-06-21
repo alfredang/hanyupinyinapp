@@ -96,23 +96,31 @@ struct UnitGridView: View {
                 Text(subtitle)
                     .font(.subheadline)
                     .foregroundStyle(Theme.mutedInk)
+                Label("点一下卡片即可朗读发音", systemImage: "speaker.wave.2.fill")
+                    .font(.caption)
+                    .foregroundStyle(Theme.secondary)
                 LazyVGrid(columns: columns, spacing: 12) {
                     ForEach(units) { unit in
-                        VStack(spacing: 6) {
-                            Text(unit.symbol)
-                                .font(.system(size: 30, weight: .bold, design: .rounded))
-                                .foregroundStyle(Theme.accent)
-                            Text(unit.example)
-                                .font(.headline)
-                                .foregroundStyle(Theme.ink)
-                            Text(unit.exampleMeaning)
-                                .font(.caption2)
-                                .foregroundStyle(Theme.mutedInk)
-                                .multilineTextAlignment(.center)
+                        Button {
+                            Speaker.shared.speak(unit.exampleHanzi)
+                        } label: {
+                            VStack(spacing: 6) {
+                                Text(unit.symbol)
+                                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                                    .foregroundStyle(Theme.accent)
+                                Text(unit.example)
+                                    .font(.headline)
+                                    .foregroundStyle(Theme.ink)
+                                Text(unit.exampleMeaning)
+                                    .font(.caption2)
+                                    .foregroundStyle(Theme.mutedInk)
+                                    .multilineTextAlignment(.center)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 110)
+                            .appCard(padding: 8)
                         }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 110)
-                        .appCard(padding: 8)
+                        .buttonStyle(.plain)
                     }
                 }
             }
@@ -133,21 +141,29 @@ struct TonesView: View {
                 Text("普通话有四个声调，声调不同，意思不同。")
                     .font(.subheadline)
                     .foregroundStyle(Theme.mutedInk)
+                Label("点一下卡片即可朗读发音", systemImage: "speaker.wave.2.fill")
+                    .font(.caption)
+                    .foregroundStyle(Theme.secondary)
                 ForEach(Array(PinyinData.tones.enumerated()), id: \.offset) { idx, tone in
-                    HStack(spacing: 16) {
-                        Text("\(idx + 1)")
-                            .font(.title.bold())
-                            .foregroundStyle(.white)
-                            .frame(width: 48, height: 48)
-                            .background(Theme.highlight, in: Circle())
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(tone.mark).font(.title3.bold()).foregroundStyle(Theme.ink)
-                            Text(tone.name).font(.subheadline).foregroundStyle(Theme.ink)
-                            Text(tone.desc).font(.caption).foregroundStyle(Theme.mutedInk)
+                    Button {
+                        Speaker.shared.speak(String(tone.mark.split(separator: " ").last ?? ""))
+                    } label: {
+                        HStack(spacing: 16) {
+                            Text("\(idx + 1)")
+                                .font(.title.bold())
+                                .foregroundStyle(.white)
+                                .frame(width: 48, height: 48)
+                                .background(Theme.highlight, in: Circle())
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(tone.mark).font(.title3.bold()).foregroundStyle(Theme.ink)
+                                Text(tone.name).font(.subheadline).foregroundStyle(Theme.ink)
+                                Text(tone.desc).font(.caption).foregroundStyle(Theme.mutedInk)
+                            }
+                            Spacer()
                         }
-                        Spacer()
+                        .appCard()
                     }
-                    .appCard()
+                    .buttonStyle(.plain)
                 }
                 Text("提示：用拼音输入法打字时，一般不用输入声调，直接打字母即可。")
                     .font(.footnote)

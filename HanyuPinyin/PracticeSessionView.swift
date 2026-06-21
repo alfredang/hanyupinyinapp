@@ -35,7 +35,10 @@ struct PracticeSessionView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             if prompts.isEmpty { prompts = session.round() }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { focused = true }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                focused = true
+                Speaker.shared.speak(current.prompt)
+            }
         }
     }
 
@@ -74,10 +77,15 @@ struct PracticeSessionView: View {
                         .font(.title3.weight(.semibold))
                         .foregroundStyle(Theme.highlight)
                 }
+                Text("点一下朗读")
+                    .font(.caption2)
+                    .foregroundStyle(Theme.secondary)
             }
             .frame(maxWidth: .infinity)
             .frame(height: 200)
             .appCard()
+            .contentShape(Rectangle())
+            .onTapGesture { Speaker.shared.speak(current.prompt) }
 
             // Input
             VStack(spacing: 12) {
@@ -164,6 +172,7 @@ struct PracticeSessionView: View {
         } else {
             feedback = .wrong(current.answer)
         }
+        Speaker.shared.speak(current.prompt)   // reinforce correct pronunciation
     }
 
     private func next() {
@@ -174,6 +183,7 @@ struct PracticeSessionView: View {
             entry = ""
             feedback = nil
             focused = true
+            Speaker.shared.speak(current.prompt)
         }
     }
 
