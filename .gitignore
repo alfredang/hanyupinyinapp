@@ -1,0 +1,19 @@
+# Secrets
+.env
+.env.*
+*.p8
+*.pem
+*.key
+*.p12
+*.mobileprovision
+
+# Xcode / XcodeGen
+*.xcodeproj/
+DerivedData/
+build/
+*.xcuserstate
+.DS_Store
+xcuserdata/
+
+# Tooling
+.playwright-mcp/
