@@ -6,6 +6,7 @@ A native iOS app for learning **Hanyu Pinyin** (Chinese romanization) and practi
 
 ![汉语拼音 — Learn, Practice, Speed challenge, and Settings](screenshot.png)
 
+[![Download from the App Store](https://img.shields.io/badge/Download_from_the-App_Store-black?logo=apple&logoColor=white)](https://apps.apple.com/us/app/%E6%B1%89%E8%AF%AD%E6%8B%BC%E9%9F%B3-hanyu-pinyin/id6782562028)
 ![Platform](https://img.shields.io/badge/platform-iOS%2017%2B-black?logo=apple)
 ![Swift](https://img.shields.io/badge/Swift-5-orange?logo=swift)
 ![SwiftUI](https://img.shields.io/badge/SwiftUI-white?logo=swift&logoColor=blue)
